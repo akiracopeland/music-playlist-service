@@ -123,6 +123,26 @@ class PlaylistNotFoundException {
     + PlaylistNotFoundException(message: String, cause: Throwable): PlaylistNotFoundException
 }
 
+class InvalidAttributeChangeException {
+    - serialVersionUID: static final long
+
+    + InvalidAttributeChangeException(): InvalidAttributeChangeException
+    + InvalidAttributeChangeException(message: String): InvalidAttributeChangeException
+    + InvalidAttributeChangeException(cause: Throwable): InvalidAttributeChangeException
+    + InvalidAttributeChangeException(message: String, cause: Throwable): InvalidAttributeChangeException
+
+}
+
+class InvalidAttributeException {
+    - serialVersionUID: static final long
+
+    + InvalidAttributeException(): InvalidAttributeException
+    + InvalidAttributeException(message: String): InvalidAttributeException
+    + InvalidAttributeException(cause: Throwable): InvalidAttributeException
+    + InvalidAttributeException(message: String, cause: Throwable): InvalidAttributeException
+
+}
+
 ' Relationships
 Playlist o-- AlbumTrack
 AddSongToPlaylistActivity o-- AlbumTrackDao
@@ -131,5 +151,8 @@ AddSongToPlaylistActivity o-- PlaylistDao
 GetPlaylistActivity o-- PlaylistDao
 GetPlaylistSongsActivity o-- PlaylistDao
 UpdatePlaylistActivity o-- PlaylistDao
+
+InvalidAttributeException <|-- InvalidAttributeValueException
+InvalidAttributeException <|-- InvalidAttributeChangeException
 
 @enduml

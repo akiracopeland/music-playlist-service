@@ -43,7 +43,7 @@ public class PlaylistDao {
         return playlist;
     }
 
-    public void savePlaylist(PlaylistModel playlistModel) {
+    public Playlist savePlaylist(PlaylistModel playlistModel) {
 
 
         Set<String> tagsSet = new HashSet<>(playlistModel.getTags());
@@ -51,5 +51,7 @@ public class PlaylistDao {
         Playlist playlist = new Playlist(playlistModel.getId(), playlistModel.getName(), playlistModel.getCustomerId(), 0, tagsSet, null);
 
         dynamoDbMapper.save(playlist);
+
+        return playlist;
     }
 }

@@ -1,10 +1,15 @@
 package com.amazon.ata.music.playlist.service.activity;
 
+import com.amazon.ata.music.playlist.service.dynamodb.models.Playlist;
+import com.amazon.ata.music.playlist.service.exceptions.InvalidAttributeChangeException;
+import com.amazon.ata.music.playlist.service.exceptions.InvalidAttributeValueException;
+import com.amazon.ata.music.playlist.service.exceptions.PlaylistNotFoundException;
 import com.amazon.ata.music.playlist.service.models.PlaylistModel;
 import com.amazon.ata.music.playlist.service.models.requests.UpdatePlaylistRequest;
 import com.amazon.ata.music.playlist.service.models.results.UpdatePlaylistResult;
 import com.amazon.ata.music.playlist.service.dynamodb.PlaylistDao;
 
+import com.amazon.ata.music.playlist.service.util.MusicPlaylistServiceUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.apache.logging.log4j.LogManager;
@@ -50,8 +55,32 @@ public class UpdatePlaylistActivity implements RequestHandler<UpdatePlaylistRequ
     public UpdatePlaylistResult handleRequest(final UpdatePlaylistRequest updatePlaylistRequest, Context context) {
         log.info("Received UpdatePlaylistRequest {}", updatePlaylistRequest);
 
+        if (!MusicPlaylistServiceUtils.isValidString(updatePlaylistRequest.getName())) {
+            throw new InvalidAttributeValueException("Invalid Playlist name");
+        }
+
+        Playlist existingPlaylist;
+
+        try {
+            existingPlaylist = playlistDao.getPlaylist(updatePlaylistRequest.getId());
+        } catch (PlaylistNotFoundException e) {
+            throw new PlaylistNotFoundException(e);
+        }
+
+        if (!existingPlaylist.getCustomerId().equals(updatePlaylistRequest.getCustomerId())) {
+            throw new InvalidAttributeChangeException("Customer ID for the request is not matching the existing playlist's customer ID");
+        }
+
+        PlaylistModel playlistModel = PlaylistModel.builder()
+                                        .withId(updatePlaylistRequest.getId())
+                                        .withName(updatePlaylistRequest.getName())
+                                        .withCustomerId(updatePlaylistRequest.getCustomerId())
+                                        .build();
+
+        playlistDao.savePlaylist(playlistModel);
+
         return UpdatePlaylistResult.builder()
-                .withPlaylist(new PlaylistModel())
+                .withPlaylist(playlistModel)
                 .build();
     }
 }
