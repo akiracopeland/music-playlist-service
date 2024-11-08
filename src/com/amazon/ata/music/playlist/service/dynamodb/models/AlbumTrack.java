@@ -24,6 +24,8 @@ public class AlbumTrack {
         this.songTitle = songTitle;
     }
 
+    public AlbumTrack() {}
+
     @DynamoDBHashKey(attributeName = "asin")
     public String getAsin() {
         return asin;

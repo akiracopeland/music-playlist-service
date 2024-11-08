@@ -48,12 +48,21 @@ public class PlaylistDao {
     public Playlist savePlaylist(PlaylistModel playlistModel) {
 
 
+        Playlist updatedPlaylist;
+
         Set<String> tagsSet = new HashSet<>(playlistModel.getTags());
 
-        Playlist playlist = new Playlist(playlistModel.getId(), playlistModel.getName(), playlistModel.getCustomerId(), 0, tagsSet, null);
+        if (getPlaylist(playlistModel.getId()) == null) {
+            updatedPlaylist = new Playlist(playlistModel.getId(), playlistModel.getName(), playlistModel.getCustomerId(), playlistModel.getSongCount(), tagsSet, new ArrayList<>());
+        } else {
+            Playlist existingPlaylist = getPlaylist(playlistModel.getId());
+            updatedPlaylist = new Playlist(playlistModel.getId(), playlistModel.getName(), playlistModel.getCustomerId(), playlistModel.getSongCount(), tagsSet, existingPlaylist.getSongList());
+        }
 
-        dynamoDbMapper.save(playlist);
 
-        return playlist;
+
+        dynamoDbMapper.save(updatedPlaylist);
+
+        return updatedPlaylist;
     }
 }
